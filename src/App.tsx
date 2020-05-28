@@ -1,12 +1,17 @@
 import React from "react";
 import "./App.css";
 import { BubbleSort } from "./algorithms/bubbleSort";
+import Header from "./components/header";
+import Visualiser from "./components/visualiser";
 function App() {
-  const arr = [10, 89, 900, 43, 3, 9, 7];
-  let sorted = new BubbleSort(arr);
-  sorted.bubbleSort();
-  console.log("Sorted: ", arr);
-  return <div className="App">Everything works!!!</div>;
+  return (
+    <React.Fragment>
+      <Header />
+      <div className="container">
+        <Visualiser />
+      </div>
+    </React.Fragment>
+  );
 }
 
 export default App;
