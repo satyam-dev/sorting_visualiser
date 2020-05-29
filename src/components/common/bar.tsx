@@ -4,17 +4,19 @@ import { BarTypesEnum } from "../../enums/barTypeEnum";
 export interface BarProps {
   color: string; //hex color
   types: BarTypesEnum; //design type
-  weight: number;
+  height: string;
+  width: string;
+  value: number;
 }
 
-const Bar: React.SFC<BarProps> = (props) => {
+const Bar: React.SFC<BarProps> = ({ width, color, height, value }) => {
   return (
     <div
       className="ml-1 ml-2"
       style={{
-        width: "20px",
-        backgroundColor: props.color,
-        height: `${props.weight}%`,
+        width: width,
+        background: color,
+        height: height,
       }}
     ></div>
   );
