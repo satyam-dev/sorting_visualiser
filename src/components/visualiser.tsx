@@ -6,12 +6,15 @@ import Header from "./header";
 import { AlgoEnum } from "../enums/algoEnums";
 import { bubbleSort } from "../utils/algorithms";
 import { generateRandomArray } from "../utils/utils";
+import { BarColorEnum } from "../enums/barColorEnum";
 export interface VisualiserProps {}
 
 export interface VisualiserState {
   arr: number[];
   selectedAlgo: AlgoEnum;
   algorithms: AlgoEnum[];
+  swapElements: number[];
+  sorted: number[];
 }
 
 class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
@@ -25,6 +28,8 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
       AlgoEnum.QuickSort,
       AlgoEnum.SelectionSort,
     ],
+    swapElements: [],
+    sorted: [],
   };
   render() {
     const { arr, algorithms, selectedAlgo } = this.state;
@@ -44,7 +49,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
         >
           {arr.map((a) => (
             <Bar
-              color="linear-gradient(to bottom, #2193b0, #6dd5ed)"
+              color={this.getBarColor(a)}
               height={this.getBarHeight(a)}
               width={this.getBarWidth(a)}
               types={BarTypesEnum.CrossLine}
@@ -63,6 +68,15 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   getBarWidth(value: number) {
     return `${100 / this.state.arr.length}%`;
   }
+  getBarColor(a: number): BarColorEnum {
+    if (_.indexOf(this.state.swapElements, a) > -1) {
+      return BarColorEnum.Swap;
+    }
+    if (_.indexOf(this.state.sorted, a) > -1) {
+      return BarColorEnum.Sorted;
+    }
+    return BarColorEnum.Default;
+  }
   handleOnChange = (algo: AlgoEnum) => {
     this.setState({ selectedAlgo: algo });
   };
@@ -80,7 +94,18 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     switch (this.state.selectedAlgo) {
       case AlgoEnum.BubbleSort:
         bubbleSort(this.state.arr).subscribe((res) => {
-          this.setState({ arr: res });
+          if (res.items) {
+            this.setState({ arr: res.items });
+          }
+          if (res.swapElements) {
+            this.setState({ swapElements: res.swapElements });
+          }
+          if (res.sorted) {
+            console.log("Sorted!!", res.sorted);
+            let sorted: number[] = [...this.state.sorted];
+            sorted.push(res.sorted);
+            this.setState({ sorted });
+          }
         });
         return;
       default:
