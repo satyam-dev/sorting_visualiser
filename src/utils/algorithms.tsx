@@ -1,5 +1,5 @@
 import { Subject } from "rxjs";
-import { swap, emitArrayItems } from "./utils";
+import { swap, updateWithDelay } from "./utils";
 import * as _ from "lodash";
 import { SortEvent } from "../models/sortEvent";
 export function bubbleSort(items: number[]): Subject<SortEvent> {
@@ -9,7 +9,7 @@ export function bubbleSort(items: number[]): Subject<SortEvent> {
     for (let j = 0; j < items.length - i; j++) {
       if (items[j] > items[j + 1]) {
         swapCount += 1;
-        emitArrayItems({
+        updateWithDelay({
           subject,
           items: _.cloneDeep(items),
           swapCount,
@@ -18,14 +18,14 @@ export function bubbleSort(items: number[]): Subject<SortEvent> {
         swap(items, j, j + 1);
       }
     }
-    emitArrayItems({
+    updateWithDelay({
       subject,
       items: _.cloneDeep(items),
       swapCount,
       sorted: [items[items.length - (i + 1)]],
     });
   }
-  emitArrayItems({
+  updateWithDelay({
     subject,
     items: _.cloneDeep(items),
     swapCount,

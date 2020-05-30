@@ -6,7 +6,7 @@ export function swap(items: number[], index1: number, index2: number) {
   items[index1] = items[index2];
   items[index2] = temp;
 }
-export function emitArrayItems(options: {
+export function updateWithDelay(options: {
   subject: Subject<SortEvent>;
   items: number[];
   swapCount: number;
@@ -15,17 +15,14 @@ export function emitArrayItems(options: {
 }) {
   if (options.swapElements) {
     setTimeout(() => {
-      console.log("SWAP!!");
       options.subject.next({
         items: options.items,
         swapElements: options.swapElements,
       });
-    }, (650 - options.items.length * 10) * options.swapCount); // 40 - 700ms
+    }, (650 - options.items.length * 10) * options.swapCount);
   }
   if (options.sorted) {
     setTimeout(() => {
-      console.log("SORT!!");
-
       options.subject.next({ sorted: options.sorted });
     }, (650 - options.items.length * 10) * options.swapCount);
   }

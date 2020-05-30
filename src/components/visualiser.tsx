@@ -11,15 +11,16 @@ export interface VisualiserProps {}
 
 export interface VisualiserState {
   original: number[];
+  sorted: number[];
   selectedAlgo: AlgoEnum;
   algorithms: AlgoEnum[];
   swapElements: number[];
-  sorted: number[];
 }
 
 class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   state = {
     original: generateRandomArray({ from: 5, to: 99 }, 25),
+    sorted: [],
     selectedAlgo: AlgoEnum.BubbleSort,
     algorithms: [
       AlgoEnum.BubbleSort,
@@ -29,7 +30,6 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
       AlgoEnum.SelectionSort,
     ],
     swapElements: [],
-    sorted: [],
   };
   render() {
     const { original, algorithms, selectedAlgo } = this.state;
@@ -40,8 +40,8 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           onSpeedChange={this.handleSpeedChange}
           algorithms={algorithms}
           selectedAlgo={selectedAlgo}
-          onChange={this.handleOnChange}
-          onActivate={() => this.sort()}
+          onChange={this.handleAlgoChange}
+          onActivate={() => this.handleActivate()}
         />
         <div
           className="container d-flex flex-row pt-1"
@@ -77,13 +77,14 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     }
     return BarColorEnum.Default;
   }
-  handleOnChange = (algo: AlgoEnum) => {
+  handleAlgoChange = (algo: AlgoEnum) => {
     this.setState({ selectedAlgo: algo });
   };
   handleSpeedChange = (e: any) => {
     const count = +e.currentTarget.value;
     this.setState({
       original: generateRandomArray({ from: 10, to: 99 }, count),
+      sorted: [],
     });
   };
   handleRefresh = () => {
@@ -96,7 +97,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     });
   };
 
-  sort() {
+  handleActivate() {
     switch (this.state.selectedAlgo) {
       case AlgoEnum.BubbleSort:
         bubbleSort(this.state.original).subscribe((res) => {
@@ -107,9 +108,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
             this.setState({ swapElements: res.swapElements });
           }
           if (res.sorted) {
-            console.log("Sorted!!", res.sorted);
-            let sorted: number[] = [...this.state.sorted];
-            sorted = [...sorted, ...res.sorted];
+            let sorted: number[] = [...this.state.sorted, ...res.sorted];
             this.setState({ sorted });
           }
         });
