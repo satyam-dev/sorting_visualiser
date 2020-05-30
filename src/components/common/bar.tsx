@@ -7,18 +7,28 @@ export interface BarProps {
   height: string;
   width: string;
   value: number;
+  showValue: boolean;
 }
 
-const Bar: React.SFC<BarProps> = ({ width, color, height, value }) => {
+const Bar: React.SFC<BarProps> = ({
+  width,
+  color,
+  height,
+  value,
+  showValue,
+}) => {
   return (
     <div
-      className="ml-1 ml-2"
+      className="ml-1 ml-2 d-flex justify-content-center"
       style={{
         width: width,
         background: color,
         height: height,
+        color: "white ",
       }}
-    ></div>
+    >
+      {showValue && value}
+    </div>
   );
 };
 

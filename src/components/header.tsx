@@ -6,15 +6,23 @@ export interface HeaderProps {
   onChange: Function;
   algorithms: AlgoEnum[];
   selectedAlgo: AlgoEnum;
+  onSpeedChange: Function;
+  onRefresh: Function;
 }
 
 class Header extends React.Component<HeaderProps, {}> {
   handleChange = (option: string) => {
-    this.setState({ selectedAlgorithm: option });
     this.props.onChange(option);
   };
   render() {
-    const { selectedAlgo, algorithms, onActivate } = this.props;
+    const {
+      selectedAlgo,
+      algorithms,
+      onActivate,
+      onSpeedChange,
+      onChange,
+      onRefresh,
+    } = this.props;
     return (
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="navbar-brand">Sorting Visualiser</div>
@@ -33,7 +41,33 @@ class Header extends React.Component<HeaderProps, {}> {
           className="collapse navbar-collapse justify-content-end"
           id="navbarNavDropdown"
         >
-          <button className="btn btn-dark mr-2" onClick={onActivate}>
+          <form>
+            <div className="form-group d-flex m-0 mr-2">
+              <label
+                htmlFor="formControlRange"
+                className="m-0 mr-2"
+                style={{ color: "white" }}
+              >
+                Change Array Size & Sorting Speed
+              </label>
+              <input
+                min={5}
+                max={60}
+                type="range"
+                className="range"
+                id="formControlRange"
+                onChange={(e) => onSpeedChange(e)}
+              />
+            </div>
+          </form>
+
+          <button
+            className="btn btn-secondary mr-2"
+            onClick={() => onRefresh()}
+          >
+            Refresh Array
+          </button>
+          <button className="btn btn-secondary mr-2" onClick={onActivate}>
             Activate
           </button>
 
@@ -57,7 +91,7 @@ class Header extends React.Component<HeaderProps, {}> {
                   {algorithms.map((algo) => (
                     <div
                       key={algo}
-                      onClick={() => this.handleChange(algo)}
+                      onClick={() => onChange(algo)}
                       className="dropdown-item"
                     >
                       {algo}

@@ -5,6 +5,7 @@ import * as _ from "lodash";
 import Header from "./header";
 import { AlgoEnum } from "../enums/algoEnums";
 import { bubbleSort } from "../utils/algorithms";
+import { generateRandomArray } from "../utils/utils";
 export interface VisualiserProps {}
 
 export interface VisualiserState {
@@ -15,7 +16,7 @@ export interface VisualiserState {
 
 class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   state = {
-    arr: [],
+    arr: generateRandomArray({ from: 5, to: 99 }, 25),
     selectedAlgo: AlgoEnum.BubbleSort,
     algorithms: [
       AlgoEnum.BubbleSort,
@@ -25,18 +26,13 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
       AlgoEnum.SelectionSort,
     ],
   };
-  componentDidMount() {
-    const randomNum: number[] = [];
-    for (let i = 1; i <= 50; i++) {
-      randomNum.push(_.random(1, 50));
-    }
-    this.setState({ arr: randomNum });
-  }
   render() {
-    const { algorithms, selectedAlgo } = this.state;
+    const { arr, algorithms, selectedAlgo } = this.state;
     return (
       <React.Fragment>
         <Header
+          onRefresh={this.handleRefresh}
+          onSpeedChange={this.handleSpeedChange}
           algorithms={algorithms}
           selectedAlgo={selectedAlgo}
           onChange={this.handleOnChange}
@@ -46,13 +42,14 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           className="container d-flex flex-row pt-1"
           style={{ height: "calc(100vh - 100px)" }}
         >
-          {this.state.arr.map((a) => (
+          {arr.map((a) => (
             <Bar
               color="linear-gradient(to bottom, #2193b0, #6dd5ed)"
               height={this.getBarHeight(a)}
               width={this.getBarWidth(a)}
               types={BarTypesEnum.CrossLine}
               value={a}
+              showValue={arr.length <= 30}
             />
           ))}
         </div>
@@ -68,6 +65,15 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   }
   handleOnChange = (algo: AlgoEnum) => {
     this.setState({ selectedAlgo: algo });
+  };
+  handleSpeedChange = (e: any) => {
+    const count = +e.currentTarget.value;
+    this.setState({ arr: generateRandomArray({ from: 10, to: 99 }, count) });
+  };
+  handleRefresh = () => {
+    this.setState({
+      arr: generateRandomArray({ from: 10, to: 99 }, this.state.arr.length),
+    });
   };
 
   sort() {
