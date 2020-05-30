@@ -11,10 +11,11 @@ export function emitArrayItems(options: {
   items: number[];
   swapCount: number;
   swapElements?: number[];
-  sorted?: number;
+  sorted?: number[];
 }) {
   if (options.swapElements) {
     setTimeout(() => {
+      console.log("SWAP!!");
       options.subject.next({
         items: options.items,
         swapElements: options.swapElements,
@@ -23,6 +24,8 @@ export function emitArrayItems(options: {
   }
   if (options.sorted) {
     setTimeout(() => {
+      console.log("SORT!!");
+
       options.subject.next({ sorted: options.sorted });
     }, (650 - options.items.length * 10) * options.swapCount);
   }
@@ -31,9 +34,10 @@ export function generateRandomArray(
   range: { from: number; to: number },
   count: number
 ) {
-  const randomArr: number[] = [];
-  for (let i = 1; i <= count; i++) {
+  let randomArr: number[] = [];
+  while (randomArr.length < count) {
     randomArr.push(_.random(range.from, range.to));
+    randomArr = _.uniq(randomArr);
   }
   return randomArr;
 }

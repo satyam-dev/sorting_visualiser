@@ -10,7 +10,7 @@ import { BarColorEnum } from "../enums/barColorEnum";
 export interface VisualiserProps {}
 
 export interface VisualiserState {
-  arr: number[];
+  original: number[];
   selectedAlgo: AlgoEnum;
   algorithms: AlgoEnum[];
   swapElements: number[];
@@ -19,7 +19,7 @@ export interface VisualiserState {
 
 class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   state = {
-    arr: generateRandomArray({ from: 5, to: 99 }, 25),
+    original: generateRandomArray({ from: 5, to: 99 }, 25),
     selectedAlgo: AlgoEnum.BubbleSort,
     algorithms: [
       AlgoEnum.BubbleSort,
@@ -32,7 +32,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     sorted: [],
   };
   render() {
-    const { arr, algorithms, selectedAlgo } = this.state;
+    const { original, algorithms, selectedAlgo } = this.state;
     return (
       <React.Fragment>
         <Header
@@ -47,14 +47,14 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           className="container d-flex flex-row pt-1"
           style={{ height: "calc(100vh - 100px)" }}
         >
-          {arr.map((a) => (
+          {original.map((a) => (
             <Bar
               color={this.getBarColor(a)}
               height={this.getBarHeight(a)}
               width={this.getBarWidth(a)}
               types={BarTypesEnum.CrossLine}
               value={a}
-              showValue={arr.length <= 30}
+              showValue={original.length <= 30}
             />
           ))}
         </div>
@@ -62,11 +62,11 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     );
   }
   getBarHeight(value: number): string {
-    const largest = _.max(this.state.arr) || value;
+    const largest = _.max(this.state.original) || value;
     return `${(value / largest) * 100}%`;
   }
   getBarWidth(value: number) {
-    return `${100 / this.state.arr.length}%`;
+    return `${100 / this.state.original.length}%`;
   }
   getBarColor(a: number): BarColorEnum {
     if (_.indexOf(this.state.swapElements, a) > -1) {
@@ -82,20 +82,26 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   };
   handleSpeedChange = (e: any) => {
     const count = +e.currentTarget.value;
-    this.setState({ arr: generateRandomArray({ from: 10, to: 99 }, count) });
+    this.setState({
+      original: generateRandomArray({ from: 10, to: 99 }, count),
+    });
   };
   handleRefresh = () => {
     this.setState({
-      arr: generateRandomArray({ from: 10, to: 99 }, this.state.arr.length),
+      original: generateRandomArray(
+        { from: 10, to: 99 },
+        this.state.original.length
+      ),
+      sorted: [],
     });
   };
 
   sort() {
     switch (this.state.selectedAlgo) {
       case AlgoEnum.BubbleSort:
-        bubbleSort(this.state.arr).subscribe((res) => {
+        bubbleSort(this.state.original).subscribe((res) => {
           if (res.items) {
-            this.setState({ arr: res.items });
+            this.setState({ original: res.items });
           }
           if (res.swapElements) {
             this.setState({ swapElements: res.swapElements });
@@ -103,7 +109,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           if (res.sorted) {
             console.log("Sorted!!", res.sorted);
             let sorted: number[] = [...this.state.sorted];
-            sorted.push(res.sorted);
+            sorted = [...sorted, ...res.sorted];
             this.setState({ sorted });
           }
         });
