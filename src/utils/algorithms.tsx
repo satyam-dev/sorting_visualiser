@@ -33,3 +33,30 @@ export function bubbleSort(items: number[]): Subject<SortEvent> {
   });
   return subject;
 }
+
+export function selectionSort(items: number[]): Subject<SortEvent> {
+  const subject = new Subject<SortEvent>();
+  for (let i = 0; i < items.length; i++) {
+    let minIndex = i;
+    for (let j = _.clone(i); j < items.length; j++) {
+      if (items[minIndex] > items[j]) {
+        minIndex = _.clone(j);
+      }
+    }
+    updateWithDelay({
+      subject,
+      items: _.cloneDeep(items),
+      swapCount: i + 1,
+      swapElements: [items[i], items[minIndex]],
+      sorted: [items[minIndex]],
+    });
+    swap(items, i, minIndex);
+  }
+  updateWithDelay({
+    subject,
+    items: _.cloneDeep(items),
+    swapCount: items.length,
+    swapElements: [],
+  });
+  return subject;
+}

@@ -4,7 +4,7 @@ import { BarTypesEnum } from "../enums/barTypeEnum";
 import * as _ from "lodash";
 import Header from "./header";
 import { AlgoEnum } from "../enums/algoEnums";
-import { bubbleSort } from "../utils/algorithms";
+import { bubbleSort, selectionSort } from "../utils/algorithms";
 import { generateRandomArray } from "../utils/utils";
 import { BarColorEnum } from "../enums/barColorEnum";
 export interface VisualiserProps {}
@@ -101,6 +101,20 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     switch (this.state.selectedAlgo) {
       case AlgoEnum.BubbleSort:
         bubbleSort(this.state.original).subscribe((res) => {
+          if (res.items) {
+            this.setState({ original: res.items });
+          }
+          if (res.swapElements) {
+            this.setState({ swapElements: res.swapElements });
+          }
+          if (res.sorted) {
+            let sorted: number[] = [...this.state.sorted, ...res.sorted];
+            this.setState({ sorted });
+          }
+        });
+        return;
+      case AlgoEnum.SelectionSort:
+        selectionSort(this.state.original).subscribe((res) => {
           if (res.items) {
             this.setState({ original: res.items });
           }
