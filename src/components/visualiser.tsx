@@ -4,7 +4,7 @@ import { BarTypesEnum } from "../enums/barTypeEnum";
 import * as _ from "lodash";
 import Header from "./header";
 import { AlgoEnum } from "../enums/algoEnums";
-import { bubbleSort, selectionSort } from "../utils/algorithms";
+import { bubbleSort, selectionSort, insertionSort } from "../utils/algorithms";
 import { generateRandomArray } from "../utils/utils";
 import { BarColorEnum } from "../enums/barColorEnum";
 export interface VisualiserProps {}
@@ -115,6 +115,20 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
         return;
       case AlgoEnum.SelectionSort:
         selectionSort(this.state.original).subscribe((res) => {
+          if (res.items) {
+            this.setState({ original: res.items });
+          }
+          if (res.swapElements) {
+            this.setState({ swapElements: res.swapElements });
+          }
+          if (res.sorted) {
+            let sorted: number[] = [...this.state.sorted, ...res.sorted];
+            this.setState({ sorted });
+          }
+        });
+        return;
+      case AlgoEnum.InsertionSort:
+        insertionSort(this.state.original).subscribe((res) => {
           if (res.items) {
             this.setState({ original: res.items });
           }

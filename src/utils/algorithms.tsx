@@ -60,3 +60,32 @@ export function selectionSort(items: number[]): Subject<SortEvent> {
   });
   return subject;
 }
+
+export function insertionSort(items: number[]): Subject<SortEvent> {
+  const subject = new Subject<SortEvent>();
+  for (let i = 1; i < items.length; i++) {
+    let current = items[i];
+    let j = i - 1;
+    while (j >= 0 && items[j] > current) {
+      items[j + 1] = items[j];
+      j--;
+    }
+    items[j + 1] = current;
+    updateWithDelay({
+      subject,
+      items: _.cloneDeep(items),
+      swapCount: i,
+      swapElements: items.slice(0, i + 1),
+    });
+    // swap(items, i, minIndex);
+  }
+  updateWithDelay({
+    subject,
+    items: _.cloneDeep(items),
+    swapCount: items.length,
+    sorted: items,
+    swapElements: [],
+  });
+  console.log("Sorted!!", items);
+  return subject;
+}
