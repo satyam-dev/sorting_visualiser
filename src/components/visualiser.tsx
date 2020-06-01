@@ -4,9 +4,16 @@ import { BarTypesEnum } from "../enums/barTypeEnum";
 import * as _ from "lodash";
 import Header from "./header";
 import { AlgoEnum } from "../enums/algoEnums";
-import { bubbleSort, selectionSort, insertionSort } from "../utils/algorithms";
+import {
+  bubbleSort,
+  selectionSort,
+  insertionSort,
+  quickSort,
+} from "../utils/algorithms";
 import { generateRandomArray } from "../utils/utils";
 import { BarColorEnum } from "../enums/barColorEnum";
+import { SortEvent } from "../models/sortEvent";
+import { Subject } from "rxjs";
 export interface VisualiserProps {}
 
 export interface VisualiserState {
@@ -15,6 +22,7 @@ export interface VisualiserState {
   selectedAlgo: AlgoEnum;
   algorithms: AlgoEnum[];
   swapElements: number[];
+  pivot: number;
 }
 
 class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
@@ -30,6 +38,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
       AlgoEnum.SelectionSort,
     ],
     swapElements: [],
+    pivot: -1,
   };
   render() {
     const { original, algorithms, selectedAlgo } = this.state;
@@ -69,6 +78,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     return `${100 / this.state.original.length}%`;
   }
   getBarColor(a: number): BarColorEnum {
+    if (a === this.state.pivot && this.state.sorted.length === 0) {
+      return BarColorEnum.Pivot;
+    }
     if (_.indexOf(this.state.swapElements, a) > -1) {
       return BarColorEnum.Swap;
     }
@@ -85,6 +97,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     this.setState({
       original: generateRandomArray({ from: 10, to: 99 }, count),
       sorted: [],
+      pivot: -1,
     });
   };
   handleRefresh = () => {
@@ -94,6 +107,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
         this.state.original.length
       ),
       sorted: [],
+      pivot: -1,
     });
   };
 
@@ -138,6 +152,44 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           if (res.sorted) {
             let sorted: number[] = [...this.state.sorted, ...res.sorted];
             this.setState({ sorted });
+          }
+        });
+        return;
+      case AlgoEnum.QuickSort:
+        const subject = new Subject<SortEvent>();
+        quickSort(
+          subject,
+          this.state.original,
+          0,
+          this.state.original.length - 1
+        );
+        let delayCounter = 0;
+        subject.subscribe((res) => {
+          if (res.items) {
+            // this.setState({ original: res.items });
+          }
+          if (res.pivot) {
+            console.log(res.pivot);
+            setTimeout(() => {
+              this.setState({ pivot: res.pivot!, original: res.items! });
+            }, (650 - this.state.original.length * 10) * delayCounter);
+
+            if (
+              JSON.stringify(res.items) === JSON.stringify(_.sortBy(res.items))
+            ) {
+              setTimeout(() => {
+                this.setState({ sorted: res.items! });
+              }, (650 - this.state.original.length * 10) * (delayCounter + 1));
+            }
+          }
+          if (res.delay) {
+            delayCounter += 1;
+            console.log(res.delay);
+          }
+          if (res.sorted) {
+            setTimeout(() => {
+              this.setState({ sorted: res.sorted! });
+            }, (650 - this.state.original.length * 10) * delayCounter);
           }
         });
         return;

@@ -3,4 +3,6 @@ export interface SortEvent {
   currentElements?: number[];
   swapElements?: number[];
   sorted?: number[];
+  pivot?: number;
+  delay?: number | string; // refactor - remove or change type. Had used it for logging purposes
 }

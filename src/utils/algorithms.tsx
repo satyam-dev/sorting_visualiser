@@ -1,5 +1,5 @@
 import { Subject } from "rxjs";
-import { swap, updateWithDelay } from "./utils";
+import { swap, updateWithDelay, partition } from "./utils";
 import * as _ from "lodash";
 import { SortEvent } from "../models/sortEvent";
 export function bubbleSort(items: number[]): Subject<SortEvent> {
@@ -12,7 +12,7 @@ export function bubbleSort(items: number[]): Subject<SortEvent> {
         updateWithDelay({
           subject,
           items: _.cloneDeep(items),
-          swapCount,
+          delay: swapCount,
           swapElements: [items[j], items[j + 1]],
         });
         swap(items, j, j + 1);
@@ -21,14 +21,14 @@ export function bubbleSort(items: number[]): Subject<SortEvent> {
     updateWithDelay({
       subject,
       items: _.cloneDeep(items),
-      swapCount,
+      delay: swapCount,
       sorted: [items[items.length - (i + 1)]],
     });
   }
   updateWithDelay({
     subject,
     items: _.cloneDeep(items),
-    swapCount,
+    delay: swapCount,
     swapElements: [],
   });
   return subject;
@@ -46,7 +46,7 @@ export function selectionSort(items: number[]): Subject<SortEvent> {
     updateWithDelay({
       subject,
       items: _.cloneDeep(items),
-      swapCount: i + 1,
+      delay: i + 1,
       swapElements: [items[i], items[minIndex]],
       sorted: [items[minIndex]],
     });
@@ -55,7 +55,7 @@ export function selectionSort(items: number[]): Subject<SortEvent> {
   updateWithDelay({
     subject,
     items: _.cloneDeep(items),
-    swapCount: items.length,
+    delay: items.length,
     swapElements: [],
   });
   return subject;
@@ -74,18 +74,46 @@ export function insertionSort(items: number[]): Subject<SortEvent> {
     updateWithDelay({
       subject,
       items: _.cloneDeep(items),
-      swapCount: i,
+      delay: i,
       swapElements: items.slice(0, i + 1),
     });
-    // swap(items, i, minIndex);
   }
   updateWithDelay({
     subject,
     items: _.cloneDeep(items),
-    swapCount: items.length,
+    delay: items.length,
     sorted: items,
     swapElements: [],
   });
   console.log("Sorted!!", items);
   return subject;
+}
+export function quickSort(
+  subject: Subject<SortEvent>, // todo: refactor if possible
+  items: Array<number>,
+  left: number = 0,
+  right: number = items.length - 1
+) {
+  let index;
+  if (items.length > 1) {
+    index = partition(items, left, right);
+    setTimeout(() => {
+      subject.next({ delay: `[]: ${items} , left: ${left} right: ${right}` }); // todo: remove or change type. Had used it for logging purposes
+    }, 0);
+
+    updateWithDelay({
+      subject,
+      items: _.cloneDeep(items),
+      pivot: items[index],
+      delay: 0, // refactor if possible
+    });
+
+    if (left < index - 1) {
+      quickSort(subject, items, left, index - 1);
+    }
+
+    if (index < right) {
+      quickSort(subject, items, index, right);
+    }
+  }
 }
