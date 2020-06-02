@@ -23,6 +23,8 @@ export interface VisualiserState {
   algorithms: AlgoEnum[];
   swapElements: number[];
   pivot: number;
+  leftOfPivot: number[];
+  rightOfPivot: number[];
 }
 
 class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
@@ -39,6 +41,8 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     ],
     swapElements: [],
     pivot: -1,
+    leftOfPivot: [],
+    rightOfPivot: [],
   };
   render() {
     const { original, algorithms, selectedAlgo } = this.state;
@@ -78,15 +82,19 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     return `${100 / this.state.original.length}%`;
   }
   getBarColor(a: number): BarColorEnum {
-    if (a === this.state.pivot && this.state.sorted.length === 0) {
-      return BarColorEnum.Pivot;
-    }
     if (_.indexOf(this.state.swapElements, a) > -1) {
       return BarColorEnum.Swap;
     }
     if (_.indexOf(this.state.sorted, a) > -1) {
       return BarColorEnum.Sorted;
     }
+    if (a === this.state.pivot && this.state.sorted.length === 0) {
+      return BarColorEnum.Pivot;
+    }
+    if (_.indexOf(this.state.leftOfPivot, a) > -1)
+      return BarColorEnum.PivotLeft;
+    if (_.indexOf(this.state.rightOfPivot, a) > -1)
+      return BarColorEnum.PivotRight;
     return BarColorEnum.Default;
   }
   handleAlgoChange = (algo: AlgoEnum) => {
@@ -165,20 +173,30 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
         );
         let delayCounter = 0;
         subject.subscribe((res) => {
-          if (res.items) {
-            // this.setState({ original: res.items });
-          }
           if (res.pivot) {
             console.log(res.pivot);
+            const pivotIndex = _.indexOf(res.items!, res.pivot);
+            const leftOfPivot = _.slice(res.items!, 0, pivotIndex) || [];
+            const rightOfPivot =
+              _.slice(res.items, pivotIndex + 1, res.items!.length) || [];
             setTimeout(() => {
-              this.setState({ pivot: res.pivot!, original: res.items! });
+              this.setState({
+                pivot: res.pivot!,
+                original: res.items!,
+                leftOfPivot,
+                rightOfPivot,
+              });
             }, (650 - this.state.original.length * 10) * delayCounter);
 
             if (
               JSON.stringify(res.items) === JSON.stringify(_.sortBy(res.items))
             ) {
               setTimeout(() => {
-                this.setState({ sorted: res.items! });
+                this.setState({
+                  sorted: res.items!,
+                  leftOfPivot: [],
+                  rightOfPivot: [],
+                });
               }, (650 - this.state.original.length * 10) * (delayCounter + 1));
             }
           }
@@ -188,7 +206,11 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           }
           if (res.sorted) {
             setTimeout(() => {
-              this.setState({ sorted: res.sorted! });
+              this.setState({
+                sorted: res.sorted!,
+                leftOfPivot: [],
+                rightOfPivot: [],
+              });
             }, (650 - this.state.original.length * 10) * delayCounter);
           }
         });
