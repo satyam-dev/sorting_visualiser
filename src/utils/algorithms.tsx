@@ -1,5 +1,5 @@
 import { Subject } from "rxjs";
-import { swap, updateWithDelay, partition } from "./utils";
+import { swap, updateWithDelay, partition, merge } from "./utils";
 import * as _ from "lodash";
 import { SortEvent } from "../models/sortEvent";
 export function bubbleSort(items: number[]): Subject<SortEvent> {
@@ -97,10 +97,6 @@ export function quickSort(
   let index;
   if (items.length > 1) {
     index = partition(items, left, right);
-    setTimeout(() => {
-      subject.next({ delay: `[]: ${items} , left: ${left} right: ${right}` }); // todo: remove or change type. Had used it for logging purposes
-    }, 0);
-
     updateWithDelay({
       subject,
       items: _.cloneDeep(items),
@@ -116,4 +112,19 @@ export function quickSort(
       quickSort(subject, items, index, right);
     }
   }
+}
+
+export function mergeSort(
+  subject: Subject<SortEvent>,
+  array: number[]
+): number[] {
+  if (array.length <= 1) {
+    return array;
+  }
+
+  const middle = Math.floor(array.length / 2);
+  const left = array.slice(0, middle);
+  const right = array.slice(middle);
+
+  return merge(subject, mergeSort(subject, left), mergeSort(subject, right));
 }

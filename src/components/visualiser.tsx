@@ -9,6 +9,7 @@ import {
   selectionSort,
   insertionSort,
   quickSort,
+  mergeSort,
 } from "../utils/algorithms";
 import { generateRandomArray } from "../utils/utils";
 import { BarColorEnum } from "../enums/barColorEnum";
@@ -25,6 +26,7 @@ export interface VisualiserState {
   pivot: number;
   leftOfPivot: number[];
   rightOfPivot: number[];
+  temp: number[];
 }
 
 class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
@@ -43,6 +45,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     pivot: -1,
     leftOfPivot: [],
     rightOfPivot: [],
+    temp: [],
   };
   render() {
     const { original, algorithms, selectedAlgo } = this.state;
@@ -186,7 +189,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
                 leftOfPivot,
                 rightOfPivot,
               });
-            }, (650 - this.state.original.length * 10) * delayCounter);
+            }, (650 - this.state.original.length * 10) * delayCounter++);
 
             if (
               JSON.stringify(res.items) === JSON.stringify(_.sortBy(res.items))
@@ -197,12 +200,8 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
                   leftOfPivot: [],
                   rightOfPivot: [],
                 });
-              }, (650 - this.state.original.length * 10) * (delayCounter + 1));
+              }, (650 - this.state.original.length * 10) * delayCounter++);
             }
-          }
-          if (res.delay) {
-            delayCounter += 1;
-            console.log(res.delay);
           }
           if (res.sorted) {
             setTimeout(() => {
@@ -211,7 +210,34 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
                 leftOfPivot: [],
                 rightOfPivot: [],
               });
-            }, (650 - this.state.original.length * 10) * delayCounter);
+            }, (650 - this.state.original.length * 10) * delayCounter++);
+          }
+        });
+        return;
+      case AlgoEnum.MergeSort:
+        const msSubject = new Subject<SortEvent>();
+        let msDelayCounter = 0;
+        const temp = [...this.state.original];
+        this.setState({ temp });
+        mergeSort(msSubject, this.state.original);
+        msSubject.asObservable().subscribe((res) => {
+          if (res.items) {
+            console.log("------------[START] Incoming event------------");
+            console.log("Received-->", res.items);
+            let arr: number[] = [...this.state.temp];
+            console.log("Array at this stage-->", arr);
+            let indices = res.items.map((r) => _.indexOf(temp, r));
+            indices = _.sortBy(indices);
+            console.log("Calculated Indices-->", indices);
+            for (let i = 0; i < indices.length; i++) {
+              arr[indices[i]] = res.items[i];
+            }
+            this.setState({ temp: arr });
+            console.log("Array after change-->", arr);
+            console.log("------------[END] Incoming event------------");
+            setTimeout(() => {
+              this.setState({ original: arr });
+            }, (650 - this.state.original.length * 10) * msDelayCounter++);
           }
         });
         return;

@@ -75,3 +75,45 @@ export function partition(
 
   return i;
 }
+
+/** Merge (conquer) step of mergeSort */
+export function merge(
+  subject: Subject<SortEvent>,
+  left: number[],
+  right: number[]
+): number[] {
+  const array: number[] = [];
+  let lIndex = 0;
+  let rIndex = 0;
+  while (lIndex + rIndex < left.length + right.length) {
+    const lItem = left[lIndex];
+    const rItem = right[rIndex];
+    if (lItem == null) {
+      array.push(rItem);
+      rIndex++;
+    } else if (rItem == null) {
+      array.push(lItem);
+      lIndex++;
+    } else if (lItem < rItem) {
+      array.push(lItem);
+      lIndex++;
+    } else {
+      array.push(rItem);
+      rIndex++;
+    }
+  }
+  setTimeout(() => {
+    subject.next({ items: _.cloneDeep(array) });
+  }, 0);
+  // console.log("Expectingg...", array);
+  return array;
+}
+
+export function getRandomColor() {
+  var letters = "0123456789ABCDEF";
+  var color = "#";
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
