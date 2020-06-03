@@ -15,12 +15,14 @@ import { generateRandomArray, getRandomColor } from "../utils/utils";
 import { BarColorEnum } from "../enums/barColorEnum";
 import { SortEvent } from "../models/sortEvent";
 import { Subject } from "rxjs";
+import { HeaderConfig } from "../models/headerConfig";
 export interface VisualiserProps {}
 
 export interface VisualiserState {
   original: number[];
   sorted: number[];
-  selectedAlgo: AlgoEnum;
+  selectedAlgo: AlgoEnum | undefined;
+  onGoingAlgo: AlgoEnum | undefined;
   algorithms: AlgoEnum[];
   swapElements: number[];
   pivot: number;
@@ -35,7 +37,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   state = {
     original: generateRandomArray({ from: 5, to: 99 }, 25),
     sorted: [],
-    selectedAlgo: AlgoEnum.BubbleSort,
+    selectedAlgo: undefined,
     algorithms: [
       AlgoEnum.BubbleSort,
       AlgoEnum.InsertionSort,
@@ -50,12 +52,14 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     temp: [], // todo refactor
     barColors: [], // todo refactor
     barColorsTemp: [], // todo refactor
+    onGoingAlgo: undefined,
   };
   render() {
     const { original, algorithms, selectedAlgo } = this.state;
     return (
       <React.Fragment>
         <Header
+          config={this.getHeaderConfig()}
           onRefresh={this.handleRefresh}
           onSpeedChange={this.handleSpeedChange}
           algorithms={algorithms}
@@ -69,6 +73,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
         >
           {original.map((a) => (
             <Bar
+              key={a}
               color={this.getBarColor(a)}
               height={this.getBarHeight(a)}
               width={this.getBarWidth(a)}
@@ -80,6 +85,14 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
         </div>
       </React.Fragment>
     );
+  }
+  getHeaderConfig(): HeaderConfig {
+    return {
+      disableActivate: !!this.state.onGoingAlgo,
+      disableRefresh: !!this.state.onGoingAlgo,
+      disableSelectAlgo: !!this.state.onGoingAlgo,
+      disableSlider: !!this.state.onGoingAlgo,
+    };
   }
   getBarHeight(value: number): string {
     const largest = _.max(this.state.original) || value;
@@ -148,8 +161,10 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   };
 
   handleActivate() {
-    switch (this.state.selectedAlgo) {
+    const selectedAlgo: any = this.state.selectedAlgo;
+    switch (selectedAlgo) {
       case AlgoEnum.BubbleSort:
+        this.setState({ onGoingAlgo: AlgoEnum.BubbleSort });
         bubbleSort(this.state.original).subscribe((res) => {
           if (res.items) {
             this.setState({ original: res.items });
@@ -159,11 +174,12 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           }
           if (res.sorted) {
             let sorted: number[] = [...this.state.sorted, ...res.sorted];
-            this.setState({ sorted });
+            this.setState({ sorted, onGoingAlgo: undefined });
           }
         });
         return;
       case AlgoEnum.SelectionSort:
+        // this.setState({ onGoingAlgo: AlgoEnum.SelectionSort }); // todo: some issue
         selectionSort(this.state.original).subscribe((res) => {
           if (res.items) {
             this.setState({ original: res.items });
@@ -173,11 +189,12 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           }
           if (res.sorted) {
             let sorted: number[] = [...this.state.sorted, ...res.sorted];
-            this.setState({ sorted });
+            this.setState({ sorted, onGoingAlgo: undefined });
           }
         });
         return;
       case AlgoEnum.InsertionSort:
+        this.setState({ onGoingAlgo: AlgoEnum.InsertionSort });
         insertionSort(this.state.original).subscribe((res) => {
           if (res.items) {
             this.setState({ original: res.items });
@@ -187,7 +204,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           }
           if (res.sorted) {
             let sorted: number[] = [...this.state.sorted, ...res.sorted];
-            this.setState({ sorted });
+            this.setState({ sorted, onGoingAlgo: undefined });
           }
         });
         return;
