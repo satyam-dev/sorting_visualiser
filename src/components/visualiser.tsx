@@ -11,7 +11,7 @@ import {
   quickSort,
   mergeSort,
 } from "../utils/algorithms";
-import { generateRandomArray } from "../utils/utils";
+import { generateRandomArray, getRandomColor } from "../utils/utils";
 import { BarColorEnum } from "../enums/barColorEnum";
 import { SortEvent } from "../models/sortEvent";
 import { Subject } from "rxjs";
@@ -26,7 +26,9 @@ export interface VisualiserState {
   pivot: number;
   leftOfPivot: number[];
   rightOfPivot: number[];
-  temp: number[];
+  temp: number[]; // todo refactor
+  barColors: { value: number; color: string }[]; // todo refactor
+  barColorsTemp: { value: number; color: string }[]; // todo refactor
 }
 
 class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
@@ -45,7 +47,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     pivot: -1,
     leftOfPivot: [],
     rightOfPivot: [],
-    temp: [],
+    temp: [], // todo refactor
+    barColors: [], // todo refactor
+    barColorsTemp: [], // todo refactor
   };
   render() {
     const { original, algorithms, selectedAlgo } = this.state;
@@ -84,7 +88,17 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   getBarWidth(value: number) {
     return `${100 / this.state.original.length}%`;
   }
-  getBarColor(a: number): BarColorEnum {
+  getBarColor(a: number): BarColorEnum | string {
+    const barColors: { value: number; color: string }[] = [
+      ...this.state.barColors,
+    ];
+    const index = _.indexOf(
+      barColors.map((r) => r.value),
+      a
+    );
+    if (index > -1) {
+      return barColors[index].color;
+    }
     if (_.indexOf(this.state.swapElements, a) > -1) {
       return BarColorEnum.Swap;
     }
@@ -101,7 +115,12 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     return BarColorEnum.Default;
   }
   handleAlgoChange = (algo: AlgoEnum) => {
-    this.setState({ selectedAlgo: algo });
+    this.setState({
+      selectedAlgo: algo,
+      temp: [],
+      barColors: [],
+      barColorsTemp: [],
+    });
   };
   handleSpeedChange = (e: any) => {
     const count = +e.currentTarget.value;
@@ -109,6 +128,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
       original: generateRandomArray({ from: 10, to: 99 }, count),
       sorted: [],
       pivot: -1,
+      temp: [],
+      barColors: [],
+      barColorsTemp: [],
     });
   };
   handleRefresh = () => {
@@ -119,6 +141,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
       ),
       sorted: [],
       pivot: -1,
+      temp: [],
+      barColors: [],
+      barColorsTemp: [],
     });
   };
 
@@ -222,22 +247,34 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
         mergeSort(msSubject, this.state.original);
         msSubject.asObservable().subscribe((res) => {
           if (res.items) {
-            console.log("------------[START] Incoming event------------");
-            console.log("Received-->", res.items);
             let arr: number[] = [...this.state.temp];
-            console.log("Array at this stage-->", arr);
             let indices = res.items.map((r) => _.indexOf(temp, r));
             indices = _.sortBy(indices);
-            console.log("Calculated Indices-->", indices);
             for (let i = 0; i < indices.length; i++) {
               arr[indices[i]] = res.items[i];
             }
-            this.setState({ temp: arr });
-            console.log("Array after change-->", arr);
-            console.log("------------[END] Incoming event------------");
+            const randomColor =
+              res.items.length === this.state.original.length
+                ? BarColorEnum.Sorted
+                : getRandomColor();
+            const barColors: { value: number; color: string }[] = [
+              ...this.state.barColorsTemp,
+            ];
+            res.items.forEach((item) => {
+              const index = _.indexOf(
+                barColors.map((v) => v.value),
+                item
+              );
+              if (index > -1) {
+                barColors[index] = { value: item, color: _.clone(randomColor) };
+              } else {
+                barColors.push({ value: item, color: _.clone(randomColor) });
+              }
+            });
+            this.setState({ temp: arr, barColorsTemp: barColors });
             setTimeout(() => {
-              this.setState({ original: arr });
-            }, (650 - this.state.original.length * 10) * msDelayCounter++);
+              this.setState({ original: arr, barColors });
+            }, (1000 - this.state.original.length * 10) * msDelayCounter++);
           }
         });
         return;

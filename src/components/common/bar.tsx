@@ -3,7 +3,7 @@ import { BarTypesEnum } from "../../enums/barTypeEnum";
 import { BarColorEnum } from "../../enums/barColorEnum";
 
 export interface BarProps {
-  color: BarColorEnum; //hex color
+  color: BarColorEnum | string; //hex color
   types: BarTypesEnum; //design type
   height: string;
   width: string;
