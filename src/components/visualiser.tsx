@@ -3,6 +3,7 @@ import Bar from "./common/bar";
 import { BarTypesEnum } from "../enums/barTypeEnum";
 import * as _ from "lodash";
 import Header from "./header";
+import random_color from "../assets/random_color.jpg";
 import { AlgoEnum } from "../enums/algoEnums";
 import {
   bubbleSort,
@@ -16,6 +17,7 @@ import { BarColorEnum } from "../enums/barColorEnum";
 import { SortEvent } from "../models/sortEvent";
 import { Subject } from "rxjs";
 import { HeaderConfig } from "../models/headerConfig";
+import ColorInfo from "./common/colorInfo";
 export interface VisualiserProps {}
 
 export interface VisualiserState {
@@ -69,7 +71,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
         />
         <div
           className="container d-flex flex-row pt-1"
-          style={{ height: "calc(100vh - 100px)" }}
+          style={{ height: "calc(100vh - 147px)" }}
         >
           {original.map((a) => (
             <Bar
@@ -82,6 +84,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
               showValue={original.length <= 30}
             />
           ))}
+        </div>
+        <div className="d-flex justify-content-center m-3">
+          {this.getColorInfo()}
         </div>
       </React.Fragment>
     );
@@ -126,6 +131,59 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     if (_.indexOf(this.state.rightOfPivot, a) > -1)
       return BarColorEnum.PivotRight;
     return BarColorEnum.Default;
+  }
+  getColorInfo() {
+    let algo: any = this.state.selectedAlgo;
+    switch (algo) {
+      case AlgoEnum.BubbleSort:
+        return (
+          <React.Fragment>
+            <ColorInfo color={BarColorEnum.Swap} text="Swapped Elements" />
+            <ColorInfo color={BarColorEnum.Sorted} text="Sorted Elements" />
+          </React.Fragment>
+        );
+      case AlgoEnum.InsertionSort:
+        return (
+          <React.Fragment>
+            <ColorInfo color={BarColorEnum.Swap} text="Sub Sorted Elements" />
+            <ColorInfo color={BarColorEnum.Sorted} text="Sorted Elements" />
+          </React.Fragment>
+        );
+      case AlgoEnum.QuickSort:
+        return (
+          <React.Fragment>
+            <ColorInfo
+              color={BarColorEnum.PivotLeft}
+              text="Elements Smaller Than Pivot"
+            />
+            <ColorInfo color={BarColorEnum.Pivot} text="Pivot Element" />
+            <ColorInfo
+              color={BarColorEnum.PivotRight}
+              text="Elements Larger Than Pivot"
+            />
+            <ColorInfo color={BarColorEnum.Sorted} text="Sorted Elements" />
+          </React.Fragment>
+        );
+      case AlgoEnum.SelectionSort:
+        return (
+          <React.Fragment>
+            <ColorInfo color={BarColorEnum.Swap} text="Swapped Elements" />
+            <ColorInfo color={BarColorEnum.Sorted} text="Sorted Elements" />
+          </React.Fragment>
+        );
+      case AlgoEnum.MergeSort:
+        return (
+          <React.Fragment>
+            <ColorInfo
+              imageUrl={random_color}
+              text="Sorted Sub Group Elements"
+            />
+            <ColorInfo color={BarColorEnum.Sorted} text="Sorted Elements" />
+          </React.Fragment>
+        );
+      default:
+        break;
+    }
   }
   handleAlgoChange = (algo: AlgoEnum) => {
     this.setState({

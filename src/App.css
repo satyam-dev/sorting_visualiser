@@ -93,3 +93,14 @@
 .range:active::-ms-thumb {
   border: none;
 }
+.color-box {
+  height: 45px;
+  width: 45px;
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
+  border-radius: 5px;
+}
+.color-info {
+  align-self: center;
+  margin-right: 1rem;
+}
