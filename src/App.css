@@ -99,8 +99,13 @@
   margin-right: 0.5rem;
   margin-left: 0.5rem;
   border-radius: 5px;
+  box-shadow: 0 3px 5px 2px #adb5bd;
 }
 .color-info {
   align-self: center;
   margin-right: 1rem;
+  font-weight: bold;
+}
+body {
+  font-family: "Quicksand", sans-serif !important;
 }

@@ -2,6 +2,7 @@ import * as React from "react";
 import { AlgoEnum } from "../enums/algoEnums";
 import ReactTooltip from "react-tooltip";
 import { HeaderConfig } from "../models/headerConfig";
+import header_logo from "../assets/header_logo.png";
 
 export interface HeaderProps {
   onActivate: any;
@@ -29,7 +30,16 @@ class Header extends React.Component<HeaderProps, {}> {
     } = this.props;
     return (
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div className="navbar-brand">Sorting Visualiser</div>
+        <div className="navbar-brand d-flex">
+          <img
+            height="32"
+            width="32"
+            className="mr-2"
+            alt="header_logo"
+            src={header_logo}
+          />
+          <div>Sorting Visualiser</div>
+        </div>
         <button
           className="navbar-toggler"
           type="button"
