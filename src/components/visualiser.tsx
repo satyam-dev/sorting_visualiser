@@ -259,7 +259,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
         return;
       case AlgoEnum.InsertionSort:
         this.setState({ onGoingAlgo: AlgoEnum.InsertionSort });
-        insertionSort(this.state.original).subscribe((res) => {
+        insertionSort([...this.state.original]).subscribe((res) => {
           if (res.items) {
             this.setState({ original: res.items });
           }
