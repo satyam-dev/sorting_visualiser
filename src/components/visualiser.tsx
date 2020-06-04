@@ -23,8 +23,8 @@ export interface VisualiserProps {}
 export interface VisualiserState {
   original: number[];
   sorted: number[];
-  selectedAlgo: AlgoEnum | undefined;
-  onGoingAlgo: AlgoEnum | undefined;
+  selectedAlgo: AlgoEnum;
+  onGoingAlgo: AlgoEnum;
   algorithms: AlgoEnum[];
   swapElements: number[];
   pivot: number;
@@ -39,7 +39,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   state = {
     original: generateRandomArray({ from: 5, to: 99 }, 25),
     sorted: [],
-    selectedAlgo: undefined,
+    selectedAlgo: AlgoEnum.None,
     algorithms: [
       AlgoEnum.BubbleSort,
       AlgoEnum.InsertionSort,
@@ -54,7 +54,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     temp: [], // todo refactor
     barColors: [], // todo refactor
     barColorsTemp: [], // todo refactor
-    onGoingAlgo: undefined,
+    onGoingAlgo: AlgoEnum.None,
   };
   render() {
     const { original, algorithms, selectedAlgo } = this.state;
@@ -93,10 +93,10 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   }
   getHeaderConfig(): HeaderConfig {
     return {
-      disableActivate: !!this.state.onGoingAlgo,
-      disableRefresh: !!this.state.onGoingAlgo,
-      disableSelectAlgo: !!this.state.onGoingAlgo,
-      disableSlider: !!this.state.onGoingAlgo,
+      disableActivate: this.state.onGoingAlgo !== AlgoEnum.None,
+      disableRefresh: this.state.onGoingAlgo !== AlgoEnum.None,
+      disableSelectAlgo: this.state.onGoingAlgo !== AlgoEnum.None,
+      disableSlider: this.state.onGoingAlgo !== AlgoEnum.None,
     };
   }
   getBarHeight(value: number): string {
@@ -223,7 +223,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     switch (selectedAlgo) {
       case AlgoEnum.BubbleSort:
         this.setState({ onGoingAlgo: AlgoEnum.BubbleSort });
-        bubbleSort(this.state.original).subscribe((res) => {
+        bubbleSort([...this.state.original]).subscribe((res) => {
           if (res.items) {
             this.setState({ original: res.items });
           }
@@ -232,13 +232,16 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           }
           if (res.sorted) {
             let sorted: number[] = [...this.state.sorted, ...res.sorted];
-            this.setState({ sorted, onGoingAlgo: undefined });
+            this.setState({ sorted });
+            if (sorted.length === this.state.original.length) {
+              this.setState({ onGoingAlgo: AlgoEnum.None });
+            }
           }
         });
         return;
       case AlgoEnum.SelectionSort:
-        // this.setState({ onGoingAlgo: AlgoEnum.SelectionSort }); // todo: some issue
-        selectionSort(this.state.original).subscribe((res) => {
+        this.setState({ onGoingAlgo: AlgoEnum.SelectionSort });
+        selectionSort([...this.state.original]).subscribe((res) => {
           if (res.items) {
             this.setState({ original: res.items });
           }
@@ -247,7 +250,10 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           }
           if (res.sorted) {
             let sorted: number[] = [...this.state.sorted, ...res.sorted];
-            this.setState({ sorted, onGoingAlgo: undefined });
+            this.setState({ sorted });
+            if (sorted.length === this.state.original.length) {
+              this.setState({ onGoingAlgo: AlgoEnum.None });
+            }
           }
         });
         return;
@@ -262,15 +268,16 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
           }
           if (res.sorted) {
             let sorted: number[] = [...this.state.sorted, ...res.sorted];
-            this.setState({ sorted, onGoingAlgo: undefined });
+            this.setState({ sorted, onGoingAlgo: AlgoEnum.None });
           }
         });
         return;
       case AlgoEnum.QuickSort:
+        this.setState({ onGoingAlgo: AlgoEnum.QuickSort });
         const subject = new Subject<SortEvent>();
         quickSort(
           subject,
-          this.state.original,
+          [...this.state.original],
           0,
           this.state.original.length - 1
         );
@@ -299,6 +306,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
                   sorted: res.items!,
                   leftOfPivot: [],
                   rightOfPivot: [],
+                  onGoingAlgo: AlgoEnum.None,
                 });
               }, (650 - this.state.original.length * 10) * delayCounter++);
             }
@@ -315,6 +323,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
         });
         return;
       case AlgoEnum.MergeSort:
+        this.setState({ onGoingAlgo: AlgoEnum.MergeSort });
         const msSubject = new Subject<SortEvent>();
         let msDelayCounter = 0;
         const temp = [...this.state.original];
@@ -349,6 +358,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
             this.setState({ temp: arr, barColorsTemp: barColors });
             setTimeout(() => {
               this.setState({ original: arr, barColors });
+              if (res.items!.length === this.state.original.length) {
+                this.setState({ onGoingAlgo: AlgoEnum.None });
+              }
             }, (1000 - this.state.original.length * 10) * msDelayCounter++);
           }
         });

@@ -8,7 +8,7 @@ export interface HeaderProps {
   onActivate: any;
   onChange: Function;
   algorithms: AlgoEnum[];
-  selectedAlgo: AlgoEnum | undefined;
+  selectedAlgo: AlgoEnum;
   onSpeedChange: Function;
   onRefresh: Function;
   config: HeaderConfig;
@@ -85,12 +85,13 @@ class Header extends React.Component<HeaderProps, {}> {
           </button>
           <button
             className={
-              "btn m-2 " + (selectedAlgo ? "btn-success" : "btn-secondary")
+              "btn m-2 " +
+              (selectedAlgo !== AlgoEnum.None ? "btn-success" : "btn-secondary")
             }
             onClick={onActivate}
             data-tip="Select Algorithm first!"
             data-place="bottom"
-            data-tip-disable={!!selectedAlgo}
+            data-tip-disable={selectedAlgo !== AlgoEnum.None}
             disabled={config.disableActivate}
           >
             Activate
@@ -109,7 +110,9 @@ class Header extends React.Component<HeaderProps, {}> {
                   aria-expanded="false"
                   disabled={config.disableSelectAlgo}
                 >
-                  {selectedAlgo || "Select Algorithm"}
+                  {selectedAlgo === AlgoEnum.None
+                    ? "Select Algorithm"
+                    : selectedAlgo}
                 </button>
                 <div
                   className="dropdown-menu action-link"
