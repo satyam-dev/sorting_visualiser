@@ -6,6 +6,9 @@
 
 ![GIF](http://g.recordit.co/PYniZmbET6.gif)
 
+## Demo
+[Sorting Visualiser](https://satyam-dev.github.io/sorting_visualiser/)
+
 
 
 ## Algorithms Included 
