@@ -1,4 +1,4 @@
-# Sorting Visualiser - Visualise and learning sorting Algorithms
+# Sorting Visualiser - Visualise and learn sorting Algorithms
 
 > See different alogrithms and its working by adjusting speed and size of the items array!
 
