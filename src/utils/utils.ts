@@ -20,12 +20,12 @@ export function updateWithDelay(options: {
         items: options.items,
         swapElements: options.swapElements,
       });
-    }, (650 - options.items.length * 10) * options.delay);
+    }, (550 - options.items.length * 10) * options.delay);
   }
   if (options.sorted) {
     setTimeout(() => {
       options.subject.next({ sorted: options.sorted });
-    }, (650 - options.items.length * 10) * options.delay);
+    }, (550 - options.items.length * 10) * options.delay);
   }
   if (options.pivot) {
     setTimeout(() => {

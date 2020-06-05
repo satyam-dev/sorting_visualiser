@@ -296,7 +296,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
                 leftOfPivot,
                 rightOfPivot,
               });
-            }, (650 - this.state.original.length * 10) * delayCounter++);
+            }, (750 - this.state.original.length * 10) * delayCounter++);
 
             if (
               JSON.stringify(res.items) === JSON.stringify(_.sortBy(res.items))
@@ -308,7 +308,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
                   rightOfPivot: [],
                   onGoingAlgo: AlgoEnum.None,
                 });
-              }, (650 - this.state.original.length * 10) * delayCounter++);
+              }, (750 - this.state.original.length * 10) * delayCounter++);
             }
           }
           if (res.sorted) {
@@ -318,7 +318,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
                 leftOfPivot: [],
                 rightOfPivot: [],
               });
-            }, (650 - this.state.original.length * 10) * delayCounter++);
+            }, (750 - this.state.original.length * 10) * delayCounter++);
           }
         });
         return;
