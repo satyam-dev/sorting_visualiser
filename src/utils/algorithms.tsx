@@ -43,21 +43,27 @@ export function selectionSort(items: number[]): Subject<SortEvent> {
         minIndex = _.clone(j);
       }
     }
-    updateWithDelay({
-      subject,
-      items: _.cloneDeep(items),
-      delay: i + 1,
-      swapElements: [items[i], items[minIndex]],
-      sorted: [items[minIndex]],
-    });
+    updateWithDelay(
+      {
+        subject,
+        items: _.cloneDeep(items),
+        delay: i + 1,
+        swapElements: [items[i], items[minIndex]],
+        sorted: [items[minIndex]],
+      },
+      650
+    );
     swap(items, i, minIndex);
   }
-  updateWithDelay({
-    subject,
-    items: _.cloneDeep(items),
-    delay: items.length,
-    swapElements: [],
-  });
+  updateWithDelay(
+    {
+      subject,
+      items: _.cloneDeep(items),
+      delay: items.length,
+      swapElements: [],
+    },
+    650
+  );
   return subject;
 }
 
@@ -97,12 +103,15 @@ export function quickSort(
   let index;
   if (items.length > 1) {
     index = partition(items, left, right);
-    updateWithDelay({
-      subject,
-      items: _.cloneDeep(items),
-      pivot: items[index],
-      delay: 0,
-    });
+    updateWithDelay(
+      {
+        subject,
+        items: _.cloneDeep(items),
+        pivot: items[index],
+        delay: 0,
+      },
+      650
+    );
 
     if (left < index - 1) {
       quickSort(subject, items, left, index - 1);

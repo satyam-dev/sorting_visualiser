@@ -88,10 +88,16 @@ class Header extends React.Component<HeaderProps, {}> {
               "btn m-2 " +
               (selectedAlgo !== AlgoEnum.None ? "btn-success" : "btn-secondary")
             }
-            onClick={onActivate}
-            data-tip="Select Algorithm first!"
+            onClick={!config.alreadySortedPromt && onActivate}
+            data-tip={
+              config.alreadySortedPromt
+                ? "Please Refresh Array!"
+                : "Select Algorithm first!"
+            }
             data-place="bottom"
-            data-tip-disable={selectedAlgo !== AlgoEnum.None}
+            data-tip-disable={
+              selectedAlgo !== AlgoEnum.None && !config.alreadySortedPromt
+            }
             disabled={config.disableActivate}
           >
             Activate

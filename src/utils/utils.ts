@@ -6,26 +6,29 @@ export function swap(items: number[], index1: number, index2: number) {
   items[index1] = items[index2];
   items[index2] = temp;
 }
-export function updateWithDelay(options: {
-  subject: Subject<SortEvent>;
-  items: number[];
-  delay: number;
-  swapElements?: number[];
-  sorted?: number[];
-  pivot?: number;
-}) {
+export function updateWithDelay(
+  options: {
+    subject: Subject<SortEvent>;
+    items: number[];
+    delay: number;
+    swapElements?: number[];
+    sorted?: number[];
+    pivot?: number;
+  },
+  delayBase = 650
+) {
   if (options.swapElements) {
     setTimeout(() => {
       options.subject.next({
         items: options.items,
         swapElements: options.swapElements,
       });
-    }, (550 - options.items.length * 10) * options.delay);
+    }, (delayBase - options.items.length * 10) * options.delay);
   }
   if (options.sorted) {
     setTimeout(() => {
       options.subject.next({ sorted: options.sorted });
-    }, (550 - options.items.length * 10) * options.delay);
+    }, (delayBase - options.items.length * 10) * options.delay);
   }
   if (options.pivot) {
     setTimeout(() => {

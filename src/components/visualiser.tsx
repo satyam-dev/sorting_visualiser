@@ -30,9 +30,9 @@ export interface VisualiserState {
   pivot: number;
   leftOfPivot: number[];
   rightOfPivot: number[];
-  sortBuffer: number[]; // todo refactor
-  barColors: { value: number; color: string }[]; // todo refactor
-  barColorsBuffer: { value: number; color: string }[]; // todo refactor
+  sortBuffer: number[];
+  barColors: { value: number; color: string }[];
+  barColorsBuffer: { value: number; color: string }[];
 }
 
 class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
@@ -41,11 +41,11 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     sorted: [],
     selectedAlgo: AlgoEnum.None,
     algorithms: [
-      AlgoEnum.BubbleSort,
+      AlgoEnum.QuickSort,
       AlgoEnum.InsertionSort,
       AlgoEnum.MergeSort,
-      AlgoEnum.QuickSort,
       AlgoEnum.SelectionSort,
+      AlgoEnum.BubbleSort,
     ],
     swapElements: [],
     pivot: -1,
@@ -97,6 +97,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
       disableRefresh: this.state.onGoingAlgo !== AlgoEnum.None,
       disableSelectAlgo: this.state.onGoingAlgo !== AlgoEnum.None,
       disableSlider: this.state.onGoingAlgo !== AlgoEnum.None,
+      alreadySortedPromt:
+        this.state.onGoingAlgo === AlgoEnum.None &&
+        _.isEqual(this.state.original, this.state.sorted),
     };
   }
   getBarHeight(value: number): string {
@@ -231,7 +234,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
             this.setState({ swapElements: res.swapElements });
           }
           if (res.sorted) {
-            let sorted: number[] = [...this.state.sorted, ...res.sorted];
+            let sorted: number[] = [...res.sorted, ...this.state.sorted];
             this.setState({ sorted });
             if (sorted.length === this.state.original.length) {
               this.setState({ onGoingAlgo: AlgoEnum.None });
@@ -296,11 +299,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
                 leftOfPivot,
                 rightOfPivot,
               });
-            }, (750 - this.state.original.length * 10) * delayCounter++);
+            }, (850 - this.state.original.length * 10) * delayCounter++);
 
-            if (
-              JSON.stringify(res.items) === JSON.stringify(_.sortBy(res.items))
-            ) {
+            if (_.isEqual(res.items, _.sortBy(res.items))) {
               setTimeout(() => {
                 this.setState({
                   sorted: res.items!,
@@ -308,7 +309,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
                   rightOfPivot: [],
                   onGoingAlgo: AlgoEnum.None,
                 });
-              }, (750 - this.state.original.length * 10) * delayCounter++);
+              }, (850 - this.state.original.length * 10) * delayCounter++);
             }
           }
           if (res.sorted) {
@@ -318,7 +319,7 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
                 leftOfPivot: [],
                 rightOfPivot: [],
               });
-            }, (750 - this.state.original.length * 10) * delayCounter++);
+            }, (850 - this.state.original.length * 10) * delayCounter++);
           }
         });
         return;
@@ -362,7 +363,10 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
             setTimeout(() => {
               this.setState({ original: sortBuffer, barColors });
               if (res.items!.length === this.state.original.length) {
-                this.setState({ onGoingAlgo: AlgoEnum.None });
+                this.setState({
+                  onGoingAlgo: AlgoEnum.None,
+                  sorted: res.items!,
+                });
               }
             }, (1000 - this.state.original.length * 10) * msDelayCounter++);
           }
