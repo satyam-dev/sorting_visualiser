@@ -69,7 +69,7 @@ class Header extends React.Component<HeaderProps, {}> {
                 min={5}
                 max={60}
                 type="range"
-                className="range"
+                className="range action-link"
                 id="formControlRange"
                 onChange={(e) => onSpeedChange(e)}
               />
