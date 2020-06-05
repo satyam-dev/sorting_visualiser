@@ -89,7 +89,7 @@ export function insertionSort(items: number[]): Subject<SortEvent> {
   return subject;
 }
 export function quickSort(
-  subject: Subject<SortEvent>, // todo: refactor if possible
+  subject: Subject<SortEvent>,
   items: Array<number>,
   left: number = 0,
   right: number = items.length - 1
@@ -101,7 +101,7 @@ export function quickSort(
       subject,
       items: _.cloneDeep(items),
       pivot: items[index],
-      delay: 0, // refactor if possible
+      delay: 0,
     });
 
     if (left < index - 1) {

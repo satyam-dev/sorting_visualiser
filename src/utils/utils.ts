@@ -76,7 +76,6 @@ export function partition(
   return i;
 }
 
-/** Merge (conquer) step of mergeSort */
 export function merge(
   subject: Subject<SortEvent>,
   left: number[],
@@ -105,7 +104,6 @@ export function merge(
   setTimeout(() => {
     subject.next({ items: _.cloneDeep(array) });
   }, 0);
-  // console.log("Expectingg...", array);
   return array;
 }
 

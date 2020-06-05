@@ -30,9 +30,9 @@ export interface VisualiserState {
   pivot: number;
   leftOfPivot: number[];
   rightOfPivot: number[];
-  temp: number[]; // todo refactor
+  sortBuffer: number[]; // todo refactor
   barColors: { value: number; color: string }[]; // todo refactor
-  barColorsTemp: { value: number; color: string }[]; // todo refactor
+  barColorsBuffer: { value: number; color: string }[]; // todo refactor
 }
 
 class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
@@ -51,9 +51,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
     pivot: -1,
     leftOfPivot: [],
     rightOfPivot: [],
-    temp: [], // todo refactor
-    barColors: [], // todo refactor
-    barColorsTemp: [], // todo refactor
+    sortBuffer: [],
+    barColors: [],
+    barColorsBuffer: [],
     onGoingAlgo: AlgoEnum.None,
   };
   render() {
@@ -188,9 +188,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
   handleAlgoChange = (algo: AlgoEnum) => {
     this.setState({
       selectedAlgo: algo,
-      temp: [],
+      sortBuffer: [],
       barColors: [],
-      barColorsTemp: [],
+      barColorsBuffer: [],
     });
   };
   handleSpeedChange = (e: any) => {
@@ -199,9 +199,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
       original: generateRandomArray({ from: 10, to: 99 }, count),
       sorted: [],
       pivot: -1,
-      temp: [],
+      sortBuffer: [],
       barColors: [],
-      barColorsTemp: [],
+      barColorsBuffer: [],
     });
   };
   handleRefresh = () => {
@@ -212,9 +212,9 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
       ),
       sorted: [],
       pivot: -1,
-      temp: [],
+      sortBuffer: [],
       barColors: [],
-      barColorsTemp: [],
+      barColorsBuffer: [],
     });
   };
 
@@ -326,23 +326,23 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
         this.setState({ onGoingAlgo: AlgoEnum.MergeSort });
         const msSubject = new Subject<SortEvent>();
         let msDelayCounter = 0;
-        const temp = [...this.state.original];
-        this.setState({ temp });
+        const originalArr = [...this.state.original];
+        this.setState({ sortBuffer: originalArr });
         mergeSort(msSubject, this.state.original);
         msSubject.asObservable().subscribe((res) => {
           if (res.items) {
-            let arr: number[] = [...this.state.temp];
-            let indices = res.items.map((r) => _.indexOf(temp, r));
+            let sortBuffer: number[] = [...this.state.sortBuffer];
+            let indices = res.items.map((r) => _.indexOf(originalArr, r));
             indices = _.sortBy(indices);
             for (let i = 0; i < indices.length; i++) {
-              arr[indices[i]] = res.items[i];
+              sortBuffer[indices[i]] = res.items[i];
             }
             const randomColor =
               res.items.length === this.state.original.length
                 ? BarColorEnum.Sorted
                 : getRandomColor();
             const barColors: { value: number; color: string }[] = [
-              ...this.state.barColorsTemp,
+              ...this.state.barColorsBuffer,
             ];
             res.items.forEach((item) => {
               const index = _.indexOf(
@@ -355,9 +355,12 @@ class Visualiser extends React.Component<VisualiserProps, VisualiserState> {
                 barColors.push({ value: item, color: _.clone(randomColor) });
               }
             });
-            this.setState({ temp: arr, barColorsTemp: barColors });
+            this.setState({
+              sortBuffer: sortBuffer,
+              barColorsBuffer: barColors,
+            });
             setTimeout(() => {
-              this.setState({ original: arr, barColors });
+              this.setState({ original: sortBuffer, barColors });
               if (res.items!.length === this.state.original.length) {
                 this.setState({ onGoingAlgo: AlgoEnum.None });
               }
